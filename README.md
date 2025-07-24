@@ -112,9 +112,34 @@ Test the server directly:
 npx @modelcontextprotocol/inspector https://hr-mcp-server.jollyflower-9d7ab707.eastus2.azurecontainerapps.io
 ```
 
-### For Copilot Studio
+### For Microsoft Copilot Studio
 
-Use the production URL as your custom connector endpoint for MCP integration.
+Integrate the HR MCP Server with Copilot Studio using the provided YAML connector specification:
+
+1. **Download the connector YAML file**:
+   ```bash
+   curl -O https://raw.githubusercontent.com/fabianwilliams/hr-mcp-server/main/copilot-studio-connector.yaml
+   ```
+
+2. **Import in Copilot Studio**:
+   - Go to your Copilot Studio environment
+   - Navigate to **Connectors** → **Custom connectors**
+   - Click **Import from OpenAPI file**
+   - Upload the `copilot-studio-connector.yaml` file
+   
+3. **Configure the connector**:
+   - **Host**: `hr-mcp-server.jollyflower-9d7ab707.eastus2.azurecontainerapps.io`
+   - **Protocol**: MCP Streamable (recommended)
+   - **Authentication**: None required (public endpoint)
+
+4. **Use in your Copilot**:
+   - Add the HR MCP Server connector to your copilot
+   - Access all 5 HR candidate management tools
+   - Enjoy persistent data across all interactions
+
+**YAML Specification**: [`copilot-studio-connector.yaml`](copilot-studio-connector.yaml)
+
+For detailed Copilot Studio MCP integration guidance, see: [Microsoft Learn - Extend agents with MCP](https://learn.microsoft.com/en-us/microsoft-copilot-studio/agent-extend-action-mcp)
 
 ## 📦 Local Development
 

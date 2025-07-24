@@ -1,0 +1,115 @@
+swagger: '2.0'
+info:
+  title: HR MCP Server
+  description: |
+    HR Candidate Management Server using Model Context Protocol (MCP) with Azure Table Storage persistence.
+    
+    This server provides comprehensive HR candidate management tools including:
+    - List all candidates with persistent storage
+    - Search candidates by name, email, skills, or role
+    - Add new candidates with full data validation
+    - Update existing candidate information
+    - Remove candidates from the system
+    
+    All data is persisted in Azure Table Storage and survives container restarts, deployments, and scaling events.
+    
+    Built on Microsoft's MCP server samples and deployed to Azure Container Apps for production use.
+  version: 1.0.0
+  contact:
+    name: Fabian Williams
+    url: https://github.com/fabianwilliams/hr-mcp-server
+  license:
+    name: MIT
+    url: https://github.com/fabianwilliams/hr-mcp-server/blob/main/LICENSE
+host: hr-mcp-server.jollyflower-9d7ab707.eastus2.azurecontainerapps.io
+basePath: /
+schemes:
+  - https
+paths:
+  /:
+    post:
+      summary: HR Candidate Management Server
+      description: |
+        Model Context Protocol server providing HR candidate management capabilities with Azure Table Storage persistence.
+        
+        Available Tools:
+        - list_candidates: Retrieve all candidates from persistent storage
+        - search_candidates: Search candidates by various criteria
+        - add_candidate: Add new candidates with validation
+        - update_candidate: Modify existing candidate information  
+        - remove_candidate: Remove candidates from the system
+        
+        All operations support concurrent access and data persistence across container lifecycle events.
+      x-ms-agentic-protocol: mcp-streamable-1.0
+      operationId: InvokeHRMCP
+      consumes:
+        - application/json
+      produces:
+        - text/event-stream
+        - application/json
+      parameters:
+        - name: body
+          in: body
+          required: true
+          description: MCP protocol request payload
+          schema:
+            type: object
+            properties:
+              jsonrpc:
+                type: string
+                example: "2.0"
+                description: JSON-RPC version
+              id:
+                type: integer
+                example: 1
+                description: Request identifier
+              method:
+                type: string
+                example: "tools/list"
+                description: MCP method to invoke
+              params:
+                type: object
+                description: Method-specific parameters
+            required:
+              - jsonrpc
+              - id
+              - method
+      responses:
+        '200':
+          description: |
+            Successful MCP response. Returns either streaming events or JSON response depending on the method.
+            
+            For tool listings and calls, responses include:
+            - Available HR management tools
+            - Candidate data from Azure Table Storage
+            - Operation results with persistence confirmation
+          schema:
+            type: object
+            properties:
+              jsonrpc:
+                type: string
+                example: "2.0"
+              id:
+                type: integer
+                example: 1
+              result:
+                type: object
+                description: Method-specific result data
+        '400':
+          description: Bad Request - Invalid MCP protocol request
+        '500':
+          description: Internal Server Error - Server processing error
+      tags:
+        - HR Management
+        - Model Context Protocol
+        - Azure Table Storage
+externalDocs:
+  description: HR MCP Server Documentation
+  url: https://github.com/fabianwilliams/hr-mcp-server
+tags:
+  - name: HR Management
+    description: Human Resources candidate management operations
+  - name: Model Context Protocol
+    description: MCP protocol operations for AI assistant integration
+  - name: Azure Table Storage
+    description: Persistent storage operations with Azure Table Storage
