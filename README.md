@@ -6,7 +6,7 @@ A Microsoft HR MCP (Model Context Protocol) server sample deployed to Azure Cont
 
 **Production URL**: https://hr-mcp-server.jollyflower-9d7ab707.eastus2.azurecontainerapps.io
 
-**Status**: ✅ Active and responding to MCP requests
+**Status**: ⚠️ Partially working - Known issues with persistence and concurrent connections
 
 ## 📋 Available Tools
 
@@ -194,6 +194,53 @@ npm error 404  '@modelcontextprotocol/server-http@*' is not in this registry.
 ```
 
 This matches the pattern used by other working HTTP MCP servers in the configuration.
+
+## 🚨 **Current Known Issues & Progress**
+
+### **Issue Analysis (Post-Deployment)**
+
+After successful deployment, testing revealed several critical issues:
+
+#### **1. Data Persistence Problem** 
+- **Symptom**: All candidate data is lost when container restarts
+- **Root Cause**: In-memory storage only, no persistent storage backend
+- **Impact**: MCP Inspector shows "HTTP 404" errors after server restart
+- **Evidence**: Container Apps uses ephemeral storage, data not persisted
+
+#### **2. Concurrent Connection Issues**
+- **Symptom**: Claude Desktop can see tools but hangs/errors when executing them
+- **Root Cause**: Poor handling of multiple simultaneous MCP client connections  
+- **Impact**: Works in MCP Inspector alone, fails when multiple clients connect
+- **Evidence**: Thread contention in in-memory candidate storage
+
+#### **3. Session Management Problems**
+- **Symptom**: Search tools work once, then return errors on subsequent calls
+- **Root Cause**: MCP session state not properly managed across requests
+- **Impact**: Inconsistent tool execution results
+
+### **Solution Plan: Azure Table Storage Integration**
+
+**Inspiration**: Following the successful pattern from `SapwoodRemoteMCPServer` which uses Azure Table Storage.
+
+**Existing Infrastructure**: We can leverage the existing `andmyagentstorage` Azure Storage Account:
+- **Connection String**: Already available in `SapwoodRemoteMCPServer/local.settings.json`
+- **Pattern**: Table Storage with `PartitionKey`/`RowKey` structure
+- **Proven**: Working successfully in production for event data
+
+**Implementation Plan**:
+1. **Add Azure Table Storage dependency** - `Azure.Data.Tables` package
+2. **Create `CandidateTableEntity`** - Map candidate data to Table Storage format
+3. **Update `CandidateService`** - Replace in-memory storage with Table Storage calls
+4. **Add configuration** - Table Storage connection string and table name
+5. **Improve concurrency** - Better async handling for multiple clients
+
+**Target Schema**:
+```
+Table: "Candidates"
+PartitionKey: "Candidate" (all candidates in same partition for now)
+RowKey: candidate.Email (unique identifier)
+Properties: FirstName, LastName, Skills, SpokenLanguages, CurrentRole
+```
 
 ## 🔍 Debugging Tips
 
