@@ -20,12 +20,14 @@ public class TableStorageCandidateService : ICandidateService
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         
-        var connectionString = configuration.GetConnectionString("TableStorage") 
-            ?? Environment.GetEnvironmentVariable("TABLE_STORAGE_CONN_STRING");
-            
+        // Use same pattern as SapwoodRemoteMCPServer
+        var connectionString = Environment.GetEnvironmentVariable("TABLE_STORAGE_CONN_STRING");
+        _logger.LogInformation("TABLE_STORAGE_CONN_STRING found: {HasValue}", !string.IsNullOrEmpty(connectionString));
+        
         if (string.IsNullOrEmpty(connectionString))
         {
-            throw new InvalidOperationException("TABLE_STORAGE_CONN_STRING environment variable or TableStorage connection string is required");
+            _logger.LogError("CRITICAL: TABLE_STORAGE_CONN_STRING environment variable not found");
+            throw new InvalidOperationException("TABLE_STORAGE_CONN_STRING environment variable is required");
         }
 
         _tableClient = new TableClient(connectionString, TABLE_NAME);
