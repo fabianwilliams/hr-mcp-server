@@ -2,6 +2,20 @@
 
 A Microsoft HR MCP (Model Context Protocol) server deployed to Azure Container Apps with **full Azure Table Storage persistence**. This server provides HR candidate management tools for AI assistants like Claude Desktop and integrates seamlessly with Copilot Studio.
 
+## 🙏 Inspiration & Credit
+
+This project builds upon the excellent foundational work by [**Paolo Pialorsi**](https://github.com/PaoloPia), a Microsoft Developer Advocate. His original **Lab 6 - MCP Server** from the Copilot Camp series demonstrated how to expose a simple, in-memory MCP server via HTTP for learning and experimentation purposes.
+
+📚 View the original lab here:  
+https://microsoft.github.io/copilot-camp/pages/make/copilot-studio/06-mcp/
+
+While Paolo's version was tailored for educational use, this project extends his concept by:
+- Deploying the MCP server fully remote to Azure Container Apps
+- Replacing in-memory lists with persistent Azure Table Storage
+- Enabling streaming and concurrent access for real-world scenarios
+
+Kudos to Paolo for providing a solid springboard and inspiration for this work.
+
 ## 🎉 **Success Story: Persistent Conversations Achieved!**
 
 **Production URL**: https://hr-mcp-server.jollyflower-9d7ab707.eastus2.azurecontainerapps.io  
