@@ -28,7 +28,7 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var dataSeedingService = scope.ServiceProvider.GetRequiredService<DataSeedingService>();
-    await dataSeedingService.SeedDataAsync();
+    await dataSeedingService.SeedDataIfEmptyAsync("Data/candidates.json");
 }
 
 // Configure the application to use the MCP server

@@ -40,3 +40,4 @@
 /Users/fabswill/ReposClaudeCode/ama/hr-mcp-server/obj/Debug/net8.0/hr-mcp-server.pdb
 /Users/fabswill/ReposClaudeCode/ama/hr-mcp-server/obj/Debug/net8.0/hr-mcp-server.genruntimeconfig.cache
 /Users/fabswill/ReposClaudeCode/ama/hr-mcp-server/obj/Debug/net8.0/ref/hr-mcp-server.dll
+/Users/fabswill/ReposClaudeCode/ama/hr-mcp-server/bin/Debug/net8.0/local.settings.json
