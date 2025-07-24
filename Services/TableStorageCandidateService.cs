@@ -51,7 +51,7 @@ public class TableStorageCandidateService : ICandidateService
             var candidates = new List<Candidate>();
             
             await foreach (var entity in _tableClient.QueryAsync<CandidateTableEntity>(
-                filter: TableClient.CreateQueryFilter($"PartitionKey eq {{"Candidate"}}")))
+                filter: TableClient.CreateQueryFilter($"PartitionKey eq 'Candidate'")))
             {
                 candidates.Add(entity.ToCandidate());
             }
@@ -173,7 +173,7 @@ public class TableStorageCandidateService : ICandidateService
             // Note: Table Storage doesn't support complex text search, so we need to retrieve all and filter
             // For production, consider using Azure Cognitive Search for better search capabilities
             await foreach (var entity in _tableClient.QueryAsync<CandidateTableEntity>(
-                filter: TableClient.CreateQueryFilter($"PartitionKey eq {{"Candidate"}}")))
+                filter: TableClient.CreateQueryFilter($"PartitionKey eq 'Candidate'")))
             {
                 var candidate = entity.ToCandidate();
                 
