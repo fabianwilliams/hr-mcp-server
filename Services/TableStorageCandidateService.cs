@@ -29,16 +29,19 @@ public class TableStorageCandidateService : ICandidateService
         }
 
         _tableClient = new TableClient(connectionString, TABLE_NAME);
-        
-        // Ensure table exists
+        _logger.LogInformation("Initialized Azure Table Storage client for table: {TableName}", TABLE_NAME);
+    }
+
+    private async Task EnsureTableExistsAsync()
+    {
         try
         {
-            _tableClient.CreateIfNotExists();
-            _logger.LogInformation("Connected to Azure Table Storage table: {TableName}", TABLE_NAME);
+            await _tableClient.CreateIfNotExistsAsync();
+            _logger.LogDebug("Ensured table exists: {TableName}", TABLE_NAME);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to connect to Azure Table Storage");
+            _logger.LogError(ex, "Failed to create table: {TableName}", TABLE_NAME);
             throw;
         }
     }
@@ -47,6 +50,7 @@ public class TableStorageCandidateService : ICandidateService
     {
         try
         {
+            await EnsureTableExistsAsync();
             _logger.LogDebug("Retrieving all candidates from Table Storage");
             var candidates = new List<Candidate>();
             
@@ -73,6 +77,7 @@ public class TableStorageCandidateService : ICandidateService
 
         try
         {
+            await EnsureTableExistsAsync();
             var entity = new CandidateTableEntity(candidate);
             
             // Check if candidate already exists
