@@ -2,10 +2,25 @@
 
 A Microsoft HR MCP (Model Context Protocol) server deployed to Azure Container Apps with HTTP streaming support and Azure Table Storage persistence. This server provides HR candidate management tools for AI assistants like Claude and Copilot Studio.
 
+## 🙏 Inspiration & Credit
+
+This project builds upon the excellent foundational work by [**Paolo Pialorsi**](https://github.com/PaoloPia), a Microsoft Developer Advocate. His original **Lab 6 - MCP Server** from the Copilot Camp series demonstrated how to expose a simple, in-memory MCP server via HTTP for learning and experimentation purposes.
+
+📚 View the original lab here:  
+https://microsoft.github.io/copilot-camp/pages/make/copilot-studio/06-mcp/
+
+While Paolo's version was tailored for educational use, this project extends his concept by:
+- Deploying the MCP server fully remote to Azure Container Apps
+- Replacing in-memory lists with persistent Azure Table Storage
+- Enabling streaming and concurrent access for real-world scenarios
+
+Kudos to Paolo for providing a solid springboard and inspiration for this work.
+
+---
+
 ## 🚀 Live Server
 
-**Production URL**: https://hr-mcp-server.jollyflower-9d7ab707.eastus2.azurecontainerapps.io
-
+**Production URL**: https://hr-mcp-server.jollyflower-9d7ab707.eastus2.azurecontainerapps.io  
 **Status**: ✅ **Working with persistent storage!** - Azure Table Storage integration completed
 
 ![Claude Desktop Working](Images/claude-desktop-working.png)
@@ -14,33 +29,33 @@ A Microsoft HR MCP (Model Context Protocol) server deployed to Azure Container A
 
 The HR MCP server provides the following candidate management tools:
 
-- `list_candidates` - List all candidates in the system
-- `search_candidates` - Search candidates by criteria
-- `add_candidate` - Add a new candidate
-- `update_candidate` - Update existing candidate information
+- `list_candidates` - List all candidates in the system  
+- `search_candidates` - Search candidates by criteria  
+- `add_candidate` - Add a new candidate  
+- `update_candidate` - Update existing candidate information  
 - `remove_candidate` - Remove a candidate from the system
 
 ## 🔧 Technology Stack
 
-- **.NET 8.0** - ASP.NET Core web application
-- **Model Context Protocol** - HTTP streaming transport
-- **Azure Container Apps** - Serverless container hosting
-- **Azure Table Storage** - Persistent candidate data storage
-- **Azure Container Registry** - Private container image storage
+- **.NET 8.0** - ASP.NET Core web application  
+- **Model Context Protocol** - HTTP streaming transport  
+- **Azure Container Apps** - Serverless container hosting  
+- **Azure Table Storage** - Persistent candidate data storage  
+- **Azure Container Registry** - Private container image storage  
 - **GitHub Actions** - CI/CD pipeline
 
 ## 🏗️ Architecture
 
 ```
-┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
-│   Claude/AI     │───▶│  HR MCP Server   │───▶│ Azure Table     │
-│   Assistant     │    │ (Container Apps) │    │   Storage       │
-└─────────────────┘    └──────────────────┘    └─────────────────┘
-                                │
-                       ┌──────────────────┐
-                       │ Azure Container  │
-                       │    Registry      │
-                       └──────────────────┘
+┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐  
+│   Human /AI     │───▶│  HR MCP Server   │───▶│ Azure Table     │  
+│   Agent         │    │ (Container Apps) │    │   Storage       │  
+└─────────────────┘    └──────────────────┘    └─────────────────┘  
+                                │  
+                       ┌──────────────────┐  
+                       │ Azure Container  │  
+                       │    Registry      │  
+                       └──────────────────┘  
 ```
 
 ## 🚀 Quick Start
@@ -90,7 +105,7 @@ dotnet run
 # The server will be available at http://localhost:5000
 ```
 
-**Note**: For local development, you'll need to configure the `TABLE_STORAGE_CONN_STRING` environment variable with your Azure Storage connection string.
+**Note**: For local development, set the `TABLE_STORAGE_CONN_STRING` environment variable with your Azure Storage connection string.
 
 ## ☁️ Azure Deployment Journey
 
@@ -100,19 +115,14 @@ dotnet run
 ✅ **Concurrent Connection Support** - Multiple clients can connect simultaneously  
 ✅ **Automatic Data Seeding** - Initial candidate data loaded from JSON file  
 ✅ **CI/CD Pipeline** - Automated deployments via GitHub Actions  
-✅ **Production Ready** - Proper error handling and logging  
+✅ **Production Ready** - Proper error handling and logging
 
 ### Deployment Process
-
-This project was deployed to Azure Container Apps with several challenges that were successfully resolved.
 
 #### Initial Setup
 
 ```bash
-# Create resource group
 az group create --name mcpserversalpha --location eastus2
-
-# Create Container Apps environment
 az containerapp env create --name mcp-env --resource-group mcpserversalpha --location eastus2
 ```
 
@@ -122,55 +132,45 @@ az containerapp env create --name mcp-env --resource-group mcpserversalpha --loc
 
 **Problem**: In-memory storage caused data loss on container restarts and poor concurrent connection handling.
 
-**Solution**: Implemented comprehensive Azure Table Storage integration:
+**Solution**:
+- `CandidateTableEntity` - Maps candidate data to Table Storage
+- `TableStorageCandidateService` - Persistent service layer
+- `DataSeedingService` - Loads data from JSON if empty
+- Async support for all reads/writes
 
-- **`CandidateTableEntity`** - Maps candidate data to Table Storage format
-- **`TableStorageCandidateService`** - Replaces in-memory storage with persistent storage
-- **`DataSeedingService`** - Automatically populates initial data from JSON file
-- **Async operations** - Proper handling of concurrent clients
-
-**Table Schema**:
+**Schema**:
 ```
 Table: "Candidates"
-PartitionKey: "Candidate" (all candidates in same partition)
-RowKey: candidate.Email (unique identifier)  
+PartitionKey: "Candidate"
+RowKey: candidate.Email
 Properties: FirstName, LastName, Skills, SpokenLanguages, CurrentRole
 ```
 
 ### 2. .NET Framework Compatibility
 
-**Problem**: Initial project targeted .NET 10.0, but Azure Container Registry only supports up to .NET 8.0.
-
-**Solution**: Updated `hr-mcp-server.csproj` to target .NET 8.0:
-
+**Problem**: Targeted .NET 10.0, but Container Registry supports up to .NET 8.0.  
+**Fix**:
 ```xml
 <TargetFramework>net8.0</TargetFramework>
 ```
 
 ### 3. Container Registry Authentication
 
-**Problem**: Container App couldn't pull custom image due to authentication issues.
-
-**Solution**: 
-1. Enabled system-assigned managed identity for Container App
-2. Granted AcrPull role to the managed identity
-3. Configured registry credentials using admin credentials
+**Fix**:
+- Enabled system-managed identity  
+- Assigned `AcrPull` role  
+- Configured registry pull via Azure CLI
 
 ### 4. Port Configuration
 
-**Problem**: ASP.NET Core app listening on port 8080, but Container App ingress configured for port 80.
-
-**Solution**: Updated Container App ingress target port to match application port:
-
+**Fix**:
 ```bash
 az containerapp ingress update --name hr-mcp-server --resource-group mcpserversalpha --target-port 8080
 ```
 
-### 5. Claude Desktop MCP Configuration
+### 5. Claude Desktop Configuration
 
-**Problem**: Initial configuration used non-existent `@modelcontextprotocol/server-http` package.
-
-**Solution**: Use `mcp-remote` package for HTTP-based MCP servers:
+**Fix**: Use `mcp-remote` with direct HTTP URL instead of `@modelcontextprotocol/server-http`.
 
 ```json
 {
@@ -181,36 +181,35 @@ az containerapp ingress update --name hr-mcp-server --resource-group mcpserversa
 
 ## 🔍 Environment Configuration
 
-### Required Environment Variables
+### Environment Variables
 
-- `TABLE_STORAGE_CONN_STRING` - Azure Storage connection string for candidate persistence
-- Optional: `ConnectionStrings__TableStorage` - Alternative configuration via connection strings
-
-### Application Settings
-
-The server automatically creates the "Candidates" table in Azure Table Storage and seeds initial data from `Data/candidates.json` if the table is empty.
+- `TABLE_STORAGE_CONN_STRING` - Required  
+- `ConnectionStrings__TableStorage` - Optional alternative config key
 
 ## 🔍 Debugging Tips
 
 ### Check Active Revisions
+
 ```bash
-az containerapp revision list --name hr-mcp-server --resource-group mcpserversalpha \
+az containerapp revision list --name hr-mcp-server --resource-group mcpserversalpha 
   --query "[].{name:name,active:properties.active,image:properties.template.containers[0].image}" -o table
 ```
 
-### View Container Logs
+### View Logs
+
 ```bash
 az containerapp logs show --name hr-mcp-server --resource-group mcpserversalpha --follow false --tail 10
 ```
 
 ### Test MCP Endpoint
+
 ```bash
-curl -X POST https://hr-mcp-server.jollyflower-9d7ab707.eastus2.azurecontainerapps.io/ \
-  -H "Content-Type: application/json" \
+curl -X POST https://hr-mcp-server.jollyflower-9d7ab707.eastus2.azurecontainerapps.io/ 
+  -H "Content-Type: application/json" 
   -d '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2024-11-05","capabilities":{},"clientInfo":{"name":"test","version":"1.0"}}}'
 ```
 
-Expected response:
+**Expected Response**:
 ```json
 {
   "result": {
@@ -231,49 +230,45 @@ Expected response:
 
 ## 📊 Performance & Scaling
 
-- **Auto-scaling**: 0-10 replicas based on demand
-- **Cold start**: ~2-3 seconds for first request
-- **Response time**: <100ms for MCP tool calls
-- **Concurrent sessions**: Supports multiple MCP clients with Azure Table Storage
-- **Data persistence**: Survives container restarts and scaling events
+- Auto-scaling: 0-10 replicas  
+- Cold start: ~2-3 sec  
+- Latency: <100ms  
+- Concurrent support: Yes  
+- Persistence: Yes (Table Storage)
 
 ## 🛡️ Security
 
-- **HTTPS**: TLS 1.3 encryption for all communications
-- **Managed Identity**: Secure access to Azure Container Registry
-- **Connection strings**: Stored securely in Container App environment variables
-- **No exposed secrets**: All credentials managed by Azure
+- TLS 1.3 (HTTPS)  
+- Managed Identity for ACR  
+- Secrets via environment vars  
+- No secrets in source code
 
 ## 📈 Monitoring
 
-- **Application Insights**: Integrated telemetry and logging
-- **Container Apps metrics**: CPU, memory, and request metrics
-- **MCP session tracking**: Session IDs logged for debugging
-- **Table Storage metrics**: Operation latency and success rates
+- Application Insights telemetry  
+- Container metrics  
+- MCP session logging  
+- Storage operation metrics
 
 ## 🤝 Contributing
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test locally and with MCP Inspector
-5. Submit a pull request
+1. Fork this repo  
+2. Create a feature branch  
+3. Test using Claude or Inspector  
+4. Submit PR  
 
 ## 📄 License
 
-This project is based on Microsoft's MCP server samples and follows the same licensing terms.
+This builds on Microsoft MCP samples. See LICENSE for terms.
 
 ## 🆘 Support
 
-For issues with:
-- **Deployment**: Check the solutions section above
-- **MCP Protocol**: Refer to [Model Context Protocol docs](https://modelcontextprotocol.io/)
-- **Azure Container Apps**: Check Azure documentation
-- **Table Storage**: Review Azure Storage documentation
+- Deployment issues → see above  
+- MCP spec → https://modelcontextprotocol.io  
+- Azure services → Azure Docs
 
 ---
 
-**Deployment completed**: July 24, 2025  
-**Last updated**: July 24, 2025  
-**Deployed by**: Claude Code (claude.ai/code)  
-**Status**: ✅ Production ready with persistent storage
+**Deployed**: July 24, 2025  
+**Maintainer**: Fabian Williams  
+**Status**: ✅ Production ready  

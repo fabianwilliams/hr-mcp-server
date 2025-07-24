@@ -1,0 +1,85 @@
+{
+  "format": 1,
+  "restore": {
+    "/Users/fabswill/ReposClaudeCode/ama/hr-mcp-server/hr-mcp-server.csproj": {}
+  },
+  "projects": {
+    "/Users/fabswill/ReposClaudeCode/ama/hr-mcp-server/hr-mcp-server.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/Users/fabswill/ReposClaudeCode/ama/hr-mcp-server/hr-mcp-server.csproj",
+        "projectName": "hr-mcp-server",
+        "projectPath": "/Users/fabswill/ReposClaudeCode/ama/hr-mcp-server/hr-mcp-server.csproj",
+        "packagesPath": "/Users/fabswill/.nuget/packages/",
+        "outputPath": "/Users/fabswill/ReposClaudeCode/ama/hr-mcp-server/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/Users/fabswill/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {},
+          "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet8/nuget/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0": {
+            "targetAlias": "net8.0",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        },
+        "SdkAnalysisLevel": "9.0.300"
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "dependencies": {
+            "Azure.Data.Tables": {
+              "target": "Package",
+              "version": "[12.11.0, )"
+            },
+            "ModelContextProtocol": {
+              "target": "Package",
+              "version": "[0.3.0-preview.3, )"
+            },
+            "ModelContextProtocol.AspNetCore": {
+              "target": "Package",
+              "version": "[0.3.0-preview.3, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.AspNetCore.App": {
+              "privateAssets": "none"
+            },
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/9.0.300/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}
