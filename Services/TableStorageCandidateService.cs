@@ -36,12 +36,14 @@ public class TableStorageCandidateService : ICandidateService
     {
         try
         {
-            await _tableClient.CreateIfNotExistsAsync();
-            _logger.LogDebug("Ensured table exists: {TableName}", TABLE_NAME);
+            _logger.LogInformation("Attempting to create table: {TableName}", TABLE_NAME);
+            var response = await _tableClient.CreateIfNotExistsAsync();
+            _logger.LogInformation("Table creation result: {TableName}, Created: {WasCreated}", TABLE_NAME, response != null);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to create table: {TableName}", TABLE_NAME);
+            _logger.LogError(ex, "CRITICAL: Failed to create table: {TableName}. Connection: {HasConnection}", 
+                TABLE_NAME, _tableClient != null);
             throw;
         }
     }
@@ -54,8 +56,7 @@ public class TableStorageCandidateService : ICandidateService
             _logger.LogDebug("Retrieving all candidates from Table Storage");
             var candidates = new List<Candidate>();
             
-            await foreach (var entity in _tableClient.QueryAsync<CandidateTableEntity>(
-                filter: TableClient.CreateQueryFilter($"PartitionKey eq 'Candidate'")))
+            await foreach (var entity in _tableClient.QueryAsync<CandidateTableEntity>(e => e.PartitionKey == "Candidate"))
             {
                 candidates.Add(entity.ToCandidate());
             }
@@ -177,8 +178,7 @@ public class TableStorageCandidateService : ICandidateService
 
             // Note: Table Storage doesn't support complex text search, so we need to retrieve all and filter
             // For production, consider using Azure Cognitive Search for better search capabilities
-            await foreach (var entity in _tableClient.QueryAsync<CandidateTableEntity>(
-                filter: TableClient.CreateQueryFilter($"PartitionKey eq 'Candidate'")))
+            await foreach (var entity in _tableClient.QueryAsync<CandidateTableEntity>(e => e.PartitionKey == "Candidate"))
             {
                 var candidate = entity.ToCandidate();
                 
