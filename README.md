@@ -53,7 +53,7 @@ Add to your `claude_desktop_config.json`:
       "command": "npx",
       "args": [
         "-y",
-        "@modelcontextprotocol/server-http",
+        "mcp-remote",
         "https://hr-mcp-server.jollyflower-9d7ab707.eastus2.azurecontainerapps.io"
       ]
     }
@@ -175,6 +175,25 @@ az containerapp ingress update --name hr-mcp-server --resource-group mcpserversa
 **Problem**: GitHub Actions workflow failed to authenticate with Azure Container Registry during automated deployments.
 
 **Current Status**: Manual deployment successful, CI/CD pipeline needs ACR credential configuration in GitHub secrets.
+
+### 6. Claude Desktop HTTP MCP Configuration
+
+**Problem**: Initial configuration used `@modelcontextprotocol/server-http` package which doesn't exist, causing "404 Not Found" npm errors.
+
+```
+npm error 404  '@modelcontextprotocol/server-http@*' is not in this registry.
+```
+
+**Solution**: Use `mcp-remote` package instead for HTTP-based MCP servers:
+
+```json
+{
+  "command": "npx",
+  "args": ["-y", "mcp-remote", "https://your-mcp-server-url"]
+}
+```
+
+This matches the pattern used by other working HTTP MCP servers in the configuration.
 
 ## 🔍 Debugging Tips
 
