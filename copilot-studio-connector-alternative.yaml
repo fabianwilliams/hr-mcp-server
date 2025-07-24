@@ -1,18 +1,18 @@
 swagger: '2.0'
 info:
   title: HR MCP Server
-  description: HR Candidate Management Server using Model Context Protocol with Azure Table Storage persistence
+  description: MCP server for HR candidate management with Azure Table Storage persistence
   version: 1.0.0
 host: hr-mcp-server.jollyflower-9d7ab707.eastus2.azurecontainerapps.io
 basePath: /
 schemes:
   - https
 paths:
-  /:
+  /mcp:
     post:
       summary: HR Candidate Management Server
       x-ms-agentic-protocol: mcp-streamable-1.0
-      operationId: InvokeHRMCP
+      operationId: InvokeMCP
       responses:
         '200':
           description: Success

@@ -116,7 +116,7 @@ npx @modelcontextprotocol/inspector https://hr-mcp-server.jollyflower-9d7ab707.e
 
 Integrate the HR MCP Server with Copilot Studio using the provided YAML connector specification:
 
-1. **Download the connector YAML file**:
+1. **Download the connector YAML file** (try the main version first):
    ```bash
    curl -O https://raw.githubusercontent.com/fabianwilliams/hr-mcp-server/main/copilot-studio-connector.yaml
    ```
@@ -137,7 +137,19 @@ Integrate the HR MCP Server with Copilot Studio using the provided YAML connecto
    - Access all 5 HR candidate management tools
    - Enjoy persistent data across all interactions
 
-**YAML Specification**: [`copilot-studio-connector.yaml`](copilot-studio-connector.yaml)
+#### 🚨 **Troubleshooting Copilot Studio Import**
+
+If you get validation errors during import, try the alternative connector:
+
+```bash
+curl -O https://raw.githubusercontent.com/fabianwilliams/hr-mcp-server/main/copilot-studio-connector-alternative.yaml
+```
+
+**Note**: The alternative uses `/mcp` path instead of `/` root path, which may be required in some Copilot Studio environments.
+
+**YAML Specifications**: 
+- [`copilot-studio-connector.yaml`](copilot-studio-connector.yaml) (main)
+- [`copilot-studio-connector-alternative.yaml`](copilot-studio-connector-alternative.yaml) (fallback)
 
 For detailed Copilot Studio MCP integration guidance, see: [Microsoft Learn - Extend agents with MCP](https://learn.microsoft.com/en-us/microsoft-copilot-studio/agent-extend-action-mcp)
 
